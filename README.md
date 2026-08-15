@@ -4,14 +4,14 @@ Pipeline code and released artifacts for *Need Not Decide: A Benchmark for
 Judicial Non-Resolution in U.S. Federal Appellate Opinions*.
 
 ```
-scripts/
-  corpus/      01-05  parse the bulk release, apply the dictionary, prevalence
-  benchmark/   06-08  item frame, stratified sample, annotation worksheets
-  models/      09     sparse baselines, fine-tuned encoders, zero-shot LM
-  analysis/    10-21  citation chains, recall audit, escalation, matching
-  paper/       11-23  LaTeX tables and figures for the paper
-  *.py                shared modules (common, triggers, issues, textstore)
-out/           released artifacts: results, prevalence tables, benchmark, labels
+corpus/      01-05  parse the bulk release, apply the dictionary, prevalence
+benchmark/   06-08  item frame, stratified sample, annotation worksheets
+models/      09     sparse baselines, fine-tuned encoders, zero-shot LM
+analysis/    10-21  citation chains, recall audit, escalation, matching
+tables/      11-23  LaTeX tables and figures for the paper
+lib/                shared modules: common, triggers, issues, textstore
+out/                released artifacts: results, prevalence tables, benchmark
+run_*.sh            pipeline runners
 ```
 
 ## The benchmark
@@ -59,13 +59,14 @@ size.
 Needs Python 3.11+ with pandas, numpy, scipy, scikit-learn, matplotlib, and
 pyarrow.
 
-Support modules sit at the top of `scripts/`: `common.py` (bulk CSV streaming — the export escapes with
+Support modules sit in `lib/`: `common.py` (bulk CSV streaming — the export escapes with
 backslashes, so `csv.reader(fh, escapechar="\\")` is required), `triggers.py`
 (the frozen 13-expression dictionary), `issues.py`, `textstore.py`,
-`guidelines.py`.
+`guidelines.py`. Every script adds `lib/` to its path, so run them from
+anywhere.
 
-`scripts/paper/` emits the LaTeX tables and figures for the paper, whose source
-is not distributed here.
+`tables/` emits the LaTeX tables and figures for the paper, whose source is not
+distributed here.
 
 ## Models
 
