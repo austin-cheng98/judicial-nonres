@@ -9,6 +9,17 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))), "lib"))
 from common import OUT, FED_APP, COURT_LABEL
 
+# Held-out sizes for table headers, read from the results rather than typed.
+def _split_sizes():
+    p = os.path.join(OUT, "09_results.csv")
+    if not os.path.exists(p):
+        return (0, 0, 0)
+    r = pd.read_csv(p)
+    return tuple(int(r[r["split"] == s]["n"].max()) for s in ("TEST", "TEMPORAL", "COURT"))
+
+
+SPLIT_N = _split_sizes()
+
 GEN = os.path.join(os.path.dirname(OUT), "paper", "generated")
 os.makedirs(GEN, exist_ok=True)
 MAC = {}
@@ -690,7 +701,8 @@ SPECS = {
    "Evaluation splits. They are disjoint at the opinion level and only "
    "\\textsc{dev} was used for fitting.", "splits"),
  "tab_models": ("llrrr",
-   "model & context & random ($n{=}54$) & temporal ($n{=}14$) & court ($n{=}27$)",
+   "model & context & random ($n{=}%d$) & temporal ($n{=}%d$) & court ($n{=}%d$)"
+   % SPLIT_N,
    "table*",
    "Macro-$F_1$ on the three held-out conditions. The lexical rule is the frozen "
    "dictionary, invariant to the window because every window is anchor-centred, "
