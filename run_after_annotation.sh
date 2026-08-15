@@ -1,6 +1,6 @@
 #!/bin/bash
 # Everything downstream of layer-one annotation. Model steps are ordered cheapest
-# first so that a failure late in the run still leaves a reportable paper.
+# first, so a late failure still leaves reportable results.
 set -e
 cd "$(dirname "$0")"
 unset OUTDIR
