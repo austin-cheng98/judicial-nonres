@@ -1,9 +1,7 @@
 """Frozen annotation guidelines.
 
-Version 1.0 was drafted before the pilot. Version 1.1 incorporates the single
-revision permitted by the study design, made once after the 300-item pilot and
-before any main-sample annotation. The revision is recorded in CHANGELOG below
-rather than folded silently into the text.
+v1.0 pre-pilot. v1.1 is the single permitted revision, made after the pilot and
+before any main-sample annotation. Recorded in CHANGELOG, not folded in silently.
 """
 
 VERSION = "1.1"

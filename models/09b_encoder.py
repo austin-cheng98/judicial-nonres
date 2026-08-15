@@ -1,8 +1,7 @@
 """Step 9b: fine-tuned encoder baseline.
 
-A domain-pretrained encoder is the strongest system in the comparison that is
-fully independent of the label source, which is why its numbers carry the
-context-scaling claim rather than the language model's.
+Strongest system independent of the label source, so it carries the
+context-scaling claim.
 """
 import json, os, sys
 import numpy as np
@@ -40,9 +39,8 @@ def run(model_name, df, ctx, device=DEV):
     xi, xm = encode(tok, tr["issue"].astype(str), tr[col].astype(str))
     y = torch.tensor(tr["y"].values)
     ds = TensorDataset(xi, xm, y)
-    # A trailing batch of one or two items is where the MPS backend was
-    # producing non-finite losses, and it contributes almost nothing to the
-    # gradient, so it is dropped whenever there is more than one full batch.
+    # Tiny trailing batches triggered non-finite losses on MPS and add nothing
+    # to the gradient. Drop them when a full batch exists.
     dl = DataLoader(ds, batch_size=BS, shuffle=True, drop_last=len(ds) > BS)
 
     dev = device
@@ -62,10 +60,8 @@ def run(model_name, df, ctx, device=DEV):
                 skipped += 1
                 continue
             loss.backward()
-            # The MPS backend can return non-finite gradients for this model
-            # even when the loss itself is finite. Stepping on them poisons
-            # every weight, and the next batch's loss is then NaN forever, so
-            # the guard has to be on the gradient rather than on the loss.
+            # MPS can return non-finite gradients with a finite loss. Stepping
+            # on them poisons every weight, so guard the gradient, not the loss.
             gnorm = torch.nn.utils.clip_grad_norm_(m.parameters(), CLIP)
             if not torch.isfinite(gnorm):
                 opt.zero_grad(set_to_none=True)

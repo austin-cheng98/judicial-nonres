@@ -1,12 +1,9 @@
-"""Step 8: render annotation worksheets and ingest completed labels.
+"""Step 8: render worksheets, ingest labels.
 
-Items are emitted in a fixed random order that ignores stratum, split, court and
-period. Annotation therefore proceeds down a shuffled list, and whatever prefix
-is completed remains a valid random subsample of the drawn benchmark rather than
-a convenience sample of whichever items were easiest or came first.
+Fixed random order ignoring stratum, split, court, period, so any completed
+prefix stays a random subsample.
 
-  python 08_worksheet.py render <batch> [n_per_batch]
-  python 08_worksheet.py ingest
+  render <batch> [n_per_batch] | ingest
 """
 import json, os, re, sys
 import pandas as pd
@@ -43,12 +40,10 @@ def clean(s):
 
 
 def render_sentonly(batch, n, pool=160):
-    """Re-render items showing only the anchor sentence.
+    """Re-render items with only the anchor sentence.
 
-    A second pass over the same items with the context removed measures how much
-    of the annotator's own decision depended on material outside the sentence.
-    It is not an inter-annotator statistic and is not reported as one. It gives a
-    human reference point for the context ablation the models are put through.
+    How much of the annotator's decision came from outside the sentence. A human
+    reference point, not an inter-annotator statistic.
     """
     b = order()
     sub = b.head(pool).sample(frac=1.0, random_state=4242).reset_index()
@@ -112,13 +107,10 @@ def ablation_stats(pool=160):
 
 
 def render_recheck(batch, n, pool=260):
-    """Second pass over already-labelled items, blind to the first pass.
+    """Second pass over labelled items, blind to the first.
 
-    Items are drawn in a different random order from the annotation order and
-    carry fresh sequential ids, so the first-pass label cannot be read off the
-    position. This measures whether the guideline is applied consistently. It is
-    intra-annotator agreement and is reported as such; it does not establish
-    that a second person would agree.
+    Different random order, fresh ids, so the first-pass label cannot be read off
+    position. Intra-annotator consistency.
     """
     done = pd.read_parquet(os.path.join(OUT, "08_annotated.parquet"))
     done = done[done["label"].isin(["DECIDED", "UNRESOLVED", "UNCLEAR"])]
@@ -213,9 +205,8 @@ def render(batch, n):
         head = (f"### {k:04d} | {r['court']} {yr} | "
                 f"{r['type_group']} | {r['stratum']}")
         block = [head, f"ISSUE: {clean(str(r['issue']))[:260]}", f"CTX: {ctx}"]
-        # Where the opinion later returns to the same proposition in a holding
-        # sentence, show it. Rule L1-3 turns on exactly that passage, and
-        # withholding it would make the item unanswerable rather than hard.
+        # Show the later holding sentence when there is one. Rule L1-3 turns
+        # on it; withholding makes the item unanswerable, not hard.
         if pd.notna(r["h2_pos"]):
             p = int(r["h2_pos"])
             if not (ws <= p <= we):
@@ -234,8 +225,8 @@ def ingest():
     b = order()
     labels = {}
     for fn in sorted(os.listdir(LB)):
-        # sent_*.txt holds the context-ablation pass. Its indices run over a
-        # different ordering, so reading it here silently overwrites main labels.
+        # sent_*.txt is the ablation pass, different ordering. Reading it here
+        # would overwrite main labels.
         if not fn.endswith(".txt") or fn.startswith("sent_"):
             continue
         for line in open(os.path.join(LB, fn), encoding="utf-8"):

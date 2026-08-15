@@ -1,9 +1,6 @@
-"""Step 10a: build issue-specific citation chains.
+"""Step 10a: issue-specific citation chains.
 
-A case-level citation graph is not enough. An opinion that left issue q open is
-usually cited for something else entirely, so the unit here is a citing passage:
-the window of text in a later opinion that surrounds an actual reporter citation
-to the origin, restricted to passages whose content words overlap the issue.
+Unit: citing passage, not case. Kept when content words overlap the issue.
 """
 import json, os, random, re, sys
 from collections import defaultdict
@@ -28,7 +25,7 @@ op2cl = dict(zip(elig["opinion_id"], elig["cluster_id"]))
 meta = elig.set_index("opinion_id")[["court", "year", "case_name",
                                      "citation_count", "n_words"]].to_dict("index")
 
-# --- reporter citations, so that a citing passage can be located in raw text
+# --- reporter citations, to locate a citing passage in raw text
 cl2cite = defaultdict(list)
 for r in stream_csv(os.path.join(DATA, "citations.csv.bz2"),
                     want=["volume", "reporter", "page", "cluster_id"],
@@ -65,9 +62,8 @@ for i, r in enumerate(ann.itertuples(index=False)):
         continue
     keys = content_words(r.issue)
     all_citers = citers.get(oid, [])
-    # A handful of origins are cited thousands of times. Scanning every citer
-    # would let those few dominate both the runtime and the sample, so a random
-    # subset is examined and the true in-degree is recorded alongside it.
+    # A few origins have thousands of citers. Sample them instead of scanning
+    # all, and record true in-degree alongside.
     if len(all_citers) > MAX_CITERS:
         examined = RNG.sample(all_citers, MAX_CITERS)
     else:

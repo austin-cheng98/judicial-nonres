@@ -1,4 +1,4 @@
-"""Shared helpers for the judicial non-resolution pipeline."""
+"""Shared helpers."""
 import bz2, csv, gzip, html, io, json, os, re, subprocess, sys
 
 csv.field_size_limit(sys.maxsize)
@@ -32,17 +32,16 @@ def period_of(year):
 
 # ---------------------------------------------------------------- csv streaming
 def stream_csv(path, want=None, progress_every=2_000_000, label=""):
-    """Stream a bulk .csv.bz2 file, yielding dicts restricted to `want` columns.
+    """Stream a bulk .csv.bz2, yielding dicts of `want` columns.
 
-    Decompression is delegated to the system bzip2 so it overlaps with parsing.
+    Decompression runs in a subprocess so it overlaps with parsing.
     """
     proc = subprocess.Popen(["bzip2", "-dc", path], stdout=subprocess.PIPE,
                             bufsize=1024 * 1024)
     fh = io.TextIOWrapper(proc.stdout, encoding="utf-8", errors="replace",
                           newline="")
-    # The bulk export escapes embedded quotes with a backslash rather than by
-    # doubling them. Parsing with the csv default silently desynchronizes the
-    # reader on roughly two thirds of rows.
+    # The export backslash-escapes quotes instead of doubling them. The csv
+    # default silently desyncs on ~2/3 of rows.
     reader = csv.reader(fh, escapechar="\\")
     header = next(reader)
     idx = {c: i for i, c in enumerate(header)}
@@ -81,9 +80,8 @@ _BLOCK = re.compile(r"</(p|div|blockquote|li|tr|h[1-6])\s*>|<br\s*/?>", re.I)
 _WS = re.compile(r"[ \t ]+")
 _NL = re.compile(r"\n{3,}")
 
-# CourtListener stores the same opinion in several markup flavours; this is the
-# precedence its own `Opinion.text` property uses, minus the citation-annotated
-# variant, which injects anchor text into the body.
+# Several markup flavours per opinion. Same precedence as CourtListener's own
+# `Opinion.text`, minus the citation-annotated variant, which injects anchors.
 TEXT_FIELDS = ["html_columbia", "html_lawbox", "xml_harvard", "html_anon_2020",
                "html", "plain_text", "html_with_citations"]
 

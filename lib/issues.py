@@ -1,9 +1,7 @@
-"""Issue-clause extraction and hard-negative structural cues.
+"""Issue-clause extraction and structural cues.
 
-Nothing here assigns a label. These routines locate the proposition a passage is
-about and flag passages whose surface form is likely to mislead a shallow
-classifier, so that the sample can be stratified over them. Whether a flagged
-passage really is a hard negative is settled by annotation, not by these rules.
+Locates the proposition a passage is about, flags surface forms likely to
+mislead a shallow classifier. Assigns no labels; annotation settles that.
 """
 import os
 import re
@@ -44,9 +42,8 @@ _LEADIN = re.compile(
     r"(?:up)?on|as\s+to|regarding|concerning|about|with\s+respect\s+to|"
     r"the\s+(?:issue|merits)\s+of)\b", re.I)
 _JUNK_HEAD = re.compile(r"^[\s,;:.)\]\"'—–-]+")
-# "we need not decide that question because ..." points back at an issue stated
-# earlier, so the words after the anchor do not state it. Rejecting sends the
-# extractor to the material before the anchor, and failing that, drops the item.
+# "we need not decide that question because ..." points back, so the words after
+# the anchor state nothing. Reject -> try before the anchor -> else drop.
 _ANAPHOR = re.compile(
     r"^(?:questions?|issues?|matters?|points?|ones?|things?)\b", re.I)
 
@@ -58,8 +55,8 @@ def _clean(s):
 def _neutralize(seg, extra_pat):
     """Cut the clause at the first disposition word, so it cannot leak a label.
 
-    Applied unconditionally, which is what lets the paper state that no issue
-    statement contains a dictionary expression or a holding cue.
+    Applied unconditionally. This is what lets the paper say no issue statement
+    contains a dictionary expression or a holding cue.
     """
     for pat in (_TRIG_IN_ISSUE, extra_pat):
         m = pat.search(seg) if pat else None
@@ -105,9 +102,8 @@ def _normalize(seg, max_words):
     if len(head) < 3 and head not in {"a", "an", "if", "in", "is", "it", "no",
                                       "of", "on", "or", "to", "we", "by", "as"}:
         return None, None
-    # A whether-clause can be short and still be a complete issue ("whether the
-    # statute is constitutional" has two content words). A bare noun phrase has
-    # to carry more, because it has no complementizer to mark it as a question.
+    # A whether-clause can be short and complete. A bare noun phrase needs
+    # more, having no complementizer to mark it as a question.
     if form == "np":
         if head in BAD_HEAD or len(content_words(seg)) < 4:
             return None, None
@@ -120,13 +116,10 @@ def _normalize(seg, max_words):
 
 
 def issue_clause(text, start, end, max_words=45, with_form=False):
-    """Statement of the proposition the anchored passage is about.
+    """Statement of the proposition the passage is about.
 
-    The clause is bounded by the sentence containing the anchor rather than by a
-    fixed character budget, which keeps it from running into whatever the court
-    said next. The complement following the anchor is preferred; where the
-    trigger closes its sentence ("that question we do not reach"), the material
-    before the anchor is used instead.
+    Bounded by the anchor's sentence, not a character budget, so it stops before
+    whatever the court said next. Prefers the complement after the anchor.
     """
     ss, se = sentence_span(text, start, end)
     before = _clean(text[ss:start])
@@ -165,9 +158,8 @@ CITATION = re.compile(r"\d+\s+(?:F\.\s?\d?d|U\.S\.|S\.\s?Ct\.|F\.\s?App'x|Fed\.\
                       re.I)
 FIRST_PERSON = re.compile(r"\b(we|this court|this panel|I)\b", re.I)
 
-# "our holding" is deliberately absent: in the pilot it pointed at a named prior
-# case far more often than at the present disposition, which made it a poor
-# locator for a decided issue in the opinion at hand.
+# "our holding" deliberately absent: in the pilot it pointed at a prior case,
+# not the present disposition.
 HOLD = re.compile(
     r"\bwe\s+(?:therefore\s+|now\s+|thus\s+|accordingly\s+)?"
     r"(?:hold|conclude|find|determine|decide|agree|reject|affirm|reverse|vacate)\b"
@@ -221,9 +213,8 @@ def find_holding_anchors(text, limit=6):
     return out
 
 
-# A neutral locator: an issue named as an issue, with no cue as to how it came
-# out. Unlike the holding locator it is not correlated with the label, which is
-# what makes it a check on whether the benchmark depends on the holding cue.
+# Neutral locator: an issue named as an issue, no outcome cue. Uncorrelated
+# with the label, so it checks whether the benchmark leans on the holding cue.
 ISSUE_MARKER = re.compile(
     r"\b(?:the\s+(?:question|issue)\s+(?:of\s+)?whether|"
     r"the\s+(?:question|issue)\s+(?:of|is|was|presented|before\s+us)|"

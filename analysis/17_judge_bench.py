@@ -1,16 +1,8 @@
-"""Step 17: an evaluation set labelled by federal judges rather than by us.
+"""Step 17: evaluation set labelled by judges.
 
-Every item here comes from one court telling us, in writing, what another court
-did with an issue. A parenthetical reading "(holding that X)" asserts that the
-cited opinion decided X. One reading "(declining to decide whether X)" asserts
-that it did not. Attaching that assertion to the passage in the cited opinion
-that the parenthetical is about gives a labelled item with no annotator in the
-loop.
-
-The set is small relative to the corpus and it is not a substitute for
-annotation: it can only cover issues a later court thought worth characterizing,
-and its labels inherit whatever the later court got wrong. It is reported as an
-independent check on the annotated benchmark, not as a replacement for it.
+"(holding that X)" = decided. "(declining to decide whether X)" = unresolved.
+Small, and inherits whatever the later court got wrong. A check, not a
+replacement for annotation.
 """
 import json, os, re, sys
 import pandas as pd

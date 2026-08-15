@@ -1,14 +1,10 @@
-"""Step 9c: zero-shot instruction-tuned language model baseline.
+"""Step 9c: zero-shot LM baseline.
 
-This baseline exists because it is the only language model in the comparison that
-is genuinely independent of the label source. The annotator cannot be used as an
-evaluated system, having written the guideline and produced the labels, so we run
-a small open instruction-tuned model locally instead.
+The one language model independent of the label source. The annotator wrote the
+guideline and produced the labels, so it cannot also be an evaluated system.
 
-The model is never asked to generate. We score the two label continuations under
-the same prompt and take the higher, which removes parsing failures, refusals,
-and format drift from the measurement, and makes the comparison across context
-widths a comparison of the model rather than of its output formatting.
+Never generates. Scores the two label continuations under one prompt and takes
+the higher, keeping refusals and format drift out of the measurement.
 """
 import json, os, sys
 import numpy as np
@@ -48,11 +44,10 @@ def encode(tok, text, special=False):
 
 
 def label_logprobs(model, tok, prompts, options):
-    """Return, for each prompt, the summed log-probability of each option.
+    """Summed log-probability of each option, per prompt.
 
-    Identical arithmetic under both backends. Appending the option to the
-    prompt, the logit at position len(base)+k-1 predicts option token k, so the
-    slice starting at len(base)-1 lines up with the option one for one.
+    Same arithmetic under both backends. With the option appended, the logit at
+    len(base)+k-1 predicts option token k, so slicing from len(base)-1 lines up.
     """
     opt_ids = [encode(tok, o) for o in options]
     out = np.zeros((len(prompts), len(options)))
@@ -90,9 +85,8 @@ def main():
         model, tok = mlx_load(MODEL)
     else:
         tok = AutoTokenizer.from_pretrained(MODEL)
-        # bfloat16 halves resident weights. Logits are cast back to float32
-        # before the log-softmax, so the scores themselves are not computed in
-        # low precision, only the forward pass.
+        # bfloat16 halves resident weights. Logits cast back to float32 before
+        # the log-softmax, so only the forward pass is low precision.
         dt = {"bf16": torch.bfloat16, "fp16": torch.float16,
               "fp32": torch.float32}[os.environ.get("LLM_DTYPE", "bf16")]
         model = AutoModelForCausalLM.from_pretrained(MODEL, dtype=dt).to(DEV).eval()

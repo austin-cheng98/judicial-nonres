@@ -1,21 +1,17 @@
 """The frozen trigger dictionary.
 
-Thirteen expressions, one per entry, matching the study design one-to-one. The
-dictionary was fixed before any annotation was carried out and was not revised
-afterwards; its SHA-1 is reported in the paper so that the frozen state is
-verifiable. Matching is case-insensitive over whitespace-normalized text, and
-each pattern tolerates a small number of intervening words so that "need not
-now decide" and "we do not here decide" are captured alongside the bare forms.
+Thirteen expressions, fixed before annotation, unrevised. SHA-1 reported in the
+paper. Case-insensitive over whitespace-normalized text, tolerating a few
+intervening words, so "need not now decide" matches.
 
-One operational decision is recorded here rather than made silently. The design
-lists the bare stem "reserve"/"reserved" (T11). In appellate prose that stem is
-dominated by senses unrelated to non-resolution: reserved rights, reserved
-easements, the Federal Reserve, objections reserved for the record. T11
-therefore requires the stem to govern an object denoting a legal question or a
-deferral. Every other expression is matched as written. T08 and T09 are proper
-subsets of T07 by construction; they are retained as separate entries because
-the design names them separately, and the prevalence tables count a passage once
-while retaining every trigger identifier that fired on it.
+T11 ("reserve"/"reserved") is the one operational departure. In appellate prose
+the bare stem mostly means reserved rights, easements, the Federal Reserve, so
+it requires an object denoting a legal question or a deferral. Everything else
+matches as written.
+
+T08 and T09 are subsets of T07 by construction, kept separate because the design
+names them separately. Prevalence counts a passage once, keeping every trigger
+id that fired.
 """
 import hashlib, re
 

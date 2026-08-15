@@ -1,4 +1,4 @@
-"""Step 2: federal appellate opinion clusters with normalized metadata."""
+"""Step 2: federal appellate clusters, normalized metadata."""
 import os, pickle, sys
 import pandas as pd
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(

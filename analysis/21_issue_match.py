@@ -1,10 +1,6 @@
-"""Step 21: escalation with issue-level matching rather than proximity.
+"""Step 21: escalation by issue matching, not proximity.
 
-The earlier proxy asked whether a non-resolution expression sat near the passage
-a later court characterized. Hand-checking showed that usually catches an
-expression governing a neighbouring question. This version instead compares the
-proposition the origin declined to decide, taken from the issue statement
-attached to each trigger, against the proposition the later court describes. Both
+Proximity mostly caught expressions governing a neighbouring question. Here both
 sides are propositions, so a match means the same question.
 """
 import json, os, sys

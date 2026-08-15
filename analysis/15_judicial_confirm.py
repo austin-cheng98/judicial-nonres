@@ -1,16 +1,7 @@
-"""Step 15: judicially confirmed labels.
+"""Step 15: labels written by judges.
 
-The weakest point in this study is that its labels were produced by one
-annotator. This step builds a validation set that no annotator touched.
-
-When a later court writes "we left that question open in Smith" it is asserting,
-on the record and under its own name, that Smith did not decide the question.
-That is a label for Smith, authored by a federal judge. The same holds in the
-other direction for "Smith held that." Harvesting both gives an external
-standard against which the annotated labels can be checked.
-
-The characterization dictionary below is frozen in the same sense as the trigger
-dictionary: fixed before it was run against anything, and reported in full.
+"we left that question open in Smith" = a label for Smith, authored by a court.
+Characterization dictionary frozen in the same sense as the trigger dictionary.
 """
 import json, os, re, sys
 from collections import defaultdict

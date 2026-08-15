@@ -1,12 +1,7 @@
-"""Step 19: escalation at scale, using two frozen dictionaries and no annotator.
+"""Step 19: escalation at scale. Two frozen dictionaries, no annotator.
 
-For each judicially authored characterization we locate, inside the cited
-opinion, the passage the characterization is about, and ask whether that passage
-carries a non-resolution expression. Where it does and the later court
-nonetheless ascribes a holding, the later court has strengthened the decisional
-status of the proposition. Both sides of that comparison come from dictionaries
-fixed in advance, so the measurement scales past what annotation can reach. It
-is coarser than annotation and its error rates are reported alongside it.
+Non-resolution expression in the cited passage, holding ascribed later
+= escalation. Coarser than annotation; error rates reported alongside.
 """
 import json, os, re, sys
 import numpy as np, pandas as pd

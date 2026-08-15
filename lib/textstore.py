@@ -1,4 +1,4 @@
-"""Random access to opinion text via the byte-offset index built in step 3."""
+"""Random access to opinion text via the step-3 byte-offset index."""
 import json, os, sys
 import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

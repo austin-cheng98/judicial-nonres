@@ -1,14 +1,7 @@
-"""Step 13: bound what the frozen dictionary misses.
+"""Step 13: what the frozen dictionary misses.
 
-The dictionary was frozen before annotation, which protects the design but says
-nothing about its coverage. Reading whole opinions at random is a weak audit: a
-non-resolution can sit anywhere in forty pages and most opinions contain none.
-
-Instead we run a second, deliberately wider probe list over the opinions the
-dictionary called clean. The probe was written after the fact and is used only
-here; it never touches candidate generation, the benchmark, or any prevalence
-figure. It gives a lower bound on missed non-resolution, since it too is lexical,
-and it identifies which expressions the frozen list should have contained.
+Wider probe list over dictionary-clean opinions. Audit only, never feeds
+candidate generation, the benchmark, or prevalence. Lexical, so a lower bound.
 """
 import json, os, random, re, sys
 import pandas as pd

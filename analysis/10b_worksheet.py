@@ -1,14 +1,9 @@
-"""Step 10b: render and ingest Layer-2 annotation of citing passages.
+"""Step 10b: layer-2 annotation of citing passages.
 
-  python 10b_worksheet.py render <batch> [n]
-  python 10b_worksheet.py ingest
+  render <batch> [n] | ingest
 
-Codes combine the status level with the two independent flags:
-  0/1/2/3  status ascribed to the origin  (L0 unresolved ... L3 established)
-  a        the later opinion attributes a resolution to the origin  (A=1)
-  e        the later opinion resolves the issue itself              (E=1)
-  o        off-issue          x  unusable
-Example: "0142 2ae" is status L2, A=1, E=1.
+Codes: 0-3 status, a = attributes a resolution, e = resolves it itself,
+o = off-issue, x = unusable. "0142 2ae" = L2, A=1, E=1.
 """
 import os, re, sys
 import pandas as pd
@@ -29,12 +24,10 @@ PER_ORIGIN = 3
 
 def order():
     ch = pd.read_parquet(os.path.join(OUT, "10a_chains.parquet"))
-    # Refined after a 23-passage pilot: raising the overlap threshold from 3 to 5
-    # roughly doubled the share of passages that are genuinely about the issue.
+    # Pilot: overlap 3 -> 5 roughly doubled on-issue share.
     ch = ch[ch["overlap"] >= MIN_OV]
-    # Cap per origin so that one heavily cited case cannot dominate the sample,
-    # and so the clustered bootstrap has many small clusters rather than a few
-    # large ones.
+    # Cap per origin: no one case dominates, and the clustered bootstrap gets
+    # many small clusters.
     ch = (ch.sample(frac=1.0, random_state=SEED)
             .groupby("origin_item_id", group_keys=False).head(PER_ORIGIN))
     return ch.sample(frac=1.0, random_state=SEED + 1).reset_index(drop=True)
@@ -57,9 +50,8 @@ def render(batch, n):
         s, e = int(r["cite_start"]), int(r["cite_end"])
         ws, we = int(r["win_start"]), int(r["win_end"])
         passage = (clean(t[ws:s]) + " <<" + clean(t[s:e]) + ">> " + clean(t[e:we]))
-        # The origin's own words are shown, never its label. Telling the
-        # annotator that the origin left the issue open would make the
-        # escalation contrast a comparison of primed judgements.
+        # Show the origin's words, never its label. Priming would make the
+        # escalation contrast meaningless.
         ot = ts.get(r["origin_opinion_id"]) or ""
         oa, ob = int(r["origin_char_start"]), int(r["origin_char_end"])
         origin = (clean(ot[max(0, oa - 320):oa]) + " <<" + clean(ot[oa:ob])

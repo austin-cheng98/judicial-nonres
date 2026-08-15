@@ -1,15 +1,11 @@
-"""Step 7: draw the stratified benchmark and define the evaluation splits.
+"""Step 7: stratified draw and evaluation splits.
 
-Natural frequencies are preserved in the population tables produced by step 5.
-The benchmark deliberately departs from them, oversampling the strata that carry
-the most information about whether a system is reasoning or pattern matching.
-Both are reported.
-
-Splits are nested and disjoint, so no opinion appears in more than one of them:
-  COURT     every item from two reserved courts
-  TEMPORAL  every remaining item filed in 2018 or later
-  TEST      a random half of what is left
-  DEV       the other half, the only portion available for model development
+Oversamples the informative strata; population rates come from step 5.
+Splits nested and disjoint:
+  COURT     two reserved courts
+  TEMPORAL  remaining items filed 2018 or later
+  TEST      random half of the rest
+  DEV       the other half, the only portion used for development
 """
 import json, os, sys
 import pandas as pd
@@ -20,19 +16,17 @@ from common import OUT, FED_APP, PERIODS
 SEED = 20260811
 HELD_OUT_COURTS = ["ca5", "cadc"]   # one large regional circuit, one specialized
 TEMPORAL_CUT = 2018
-# Allocation follows the pilot, which found the H1 stratum to be close to evenly
-# split between the two labels while PLAIN and CTRL_HOLD are nearly degenerate.
-# Sample is therefore moved toward H1 for power. This changes how many items are
-# drawn from each stratum; it changes no label definition and no stratum
-# definition, both of which were fixed before the pilot ran.
+# Pilot: H1 near evenly split, PLAIN and CTRL_HOLD nearly degenerate. Weight
+# toward H1 for power. Changes counts only; label and stratum definitions were
+# fixed before the pilot.
 QUOTA = {"PLAIN": 500, "H1": 450, "H2": 300, "CTRL_HOLD": 400, "CTRL_RAND": 150}
 
 frame = pd.read_parquet(os.path.join(OUT, "06_frame.parquet"))
 print("frame size:", f"{len(frame):,}")
 print(frame["stratum"].value_counts().to_string())
 
-# At most one item per opinion, so that context windows never overlap and the
-# splits can be made disjoint at the opinion level.
+# One item per opinion: windows never overlap, splits stay disjoint at the
+# opinion level.
 frame = frame.sample(frac=1.0, random_state=SEED).drop_duplicates("opinion_id")
 print(f"after one-item-per-opinion: {len(frame):,}")
 

@@ -1,10 +1,7 @@
-"""Step 4: the citation graph restricted to the federal appellate population.
+"""Step 4: citation graph, population only.
 
-The bulk citation map is an opinion-to-opinion edge list with a depth field
-recording how many times the citing opinion cites the cited one. Edges are kept
-when the cited opinion is in the population; whether the citing opinion is also
-in the population is recorded rather than used as a filter, so that the share of
-out-of-population citers can be reported.
+Edges kept when the cited opinion is in the population. Whether the citer is too
+is recorded rather than filtered, so the out-of-population share is reportable.
 """
 import os, sys
 import pandas as pd

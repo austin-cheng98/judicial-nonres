@@ -1,16 +1,8 @@
-"""Step 16: use judicially authored characterizations two ways.
+"""Step 16: judicial characterizations, two uses.
 
-First as external validation. For a benchmark item whose originating opinion is
-later characterized by another court on the same issue, that later court's
-statement is a label produced by a federal judge. Agreement between it and the
-annotation is a check no annotator was involved in.
-
-Second as the layer-two measurement. Comparing how often later courts ascribe a
-holding to origins we labelled UNRESOLVED against origins we labelled DECIDED is
-exactly the escalation contrast, now at a sample size annotation cannot reach.
-
-Both restrict to issue-specific characterizations, since an opinion is usually
-cited for something other than the issue we annotated.
+Validation: judge-authored label against ours.
+Layer two: the escalation contrast, at a scale annotation cannot reach.
+Issue-specific characterizations only.
 """
 import json, os, sys
 import numpy as np
@@ -38,9 +30,8 @@ def cluster_boot(df, stat, n=4000):
 
 
 def main():
-    # The tight set requires the characterizing verb to bind directly to the
-    # citation, which raises precision from roughly a third to near ceiling on
-    # inspection, at the cost of keeping 1.6% of loosely matched passages.
+    # Tight = verb binds directly to the citation. Precision ~1/3 -> near
+    # ceiling, keeping 1.6% of loose matches.
     jc = pd.read_parquet(os.path.join(OUT, "15_tight.parquet"))
     ann = pd.read_parquet(os.path.join(OUT, "08_annotated.parquet"))
     ann = ann[ann["label"].isin(["DECIDED", "UNRESOLVED"])]

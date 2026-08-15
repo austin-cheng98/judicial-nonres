@@ -1,8 +1,6 @@
 """Step 18: evaluate on the judge-labelled set.
 
-If systems trained on our annotations transfer to items labelled by federal
-judges, that is evidence about the annotations that does not depend on the
-annotator. If they do not transfer, that is evidence too.
+Transfer, or its absence, is evidence about the annotations either way.
 """
 import json, os, re, sys
 import numpy as np, pandas as pd

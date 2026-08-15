@@ -1,18 +1,13 @@
-"""Step 6: build the item frame from which the benchmark is sampled.
+"""Step 6: item frame the benchmark is sampled from.
 
-Three families of item are produced.
+  TRIGGER    passage with a dictionary expression. Sub-strata: PLAIN,
+             H1 (expression plausibly about another institution, or quoted),
+             H2 (later holding sentence, same proposition).
+  CTRL_HOLD  matched passage from a zero-trigger opinion, found by a holding cue.
+  CTRL_RAND  same, found by a neutral marker that names an issue without
+             signalling the outcome.
 
-  TRIGGER   A passage containing a dictionary expression. Sub-stratified into
-            PLAIN, H1 (the expression is plausibly about another institution or
-            sits inside a quotation), and H2 (a later holding sentence in the
-            same opinion is about the same proposition).
-  CTRL_HOLD A matched passage from an opinion containing no dictionary
-            expression at all, located by a holding cue.
-  CTRL_RAND A matched passage from a zero-trigger opinion, located by a neutral
-            marker that names an issue as an issue without any cue as to how it
-            came out, so the benchmark does not rest on one control locator.
-
-Structural flags stratify the sample. They never assign a label.
+Flags stratify the sample. They never assign a label.
 """
 import json, os, random, sys
 from collections import defaultdict
@@ -88,11 +83,9 @@ trig["n_words"] = trig["opinion_id"].map(lambda o: info[o]["n_words"])
 wq = elig["n_words"].quantile(np.linspace(0, 1, 11)).values
 trig["wdec"] = np.clip(np.searchsorted(wq[1:-1], trig["n_words"]), 0, 9)
 
-# One control opinion is drawn per distinct trigger-bearing opinion, matched on
-# court, period, opinion type, and length decile, without replacement. Matching
-# every trigger-bearing opinion in the corpus would take far longer than it is
-# worth: the control quota is in the hundreds, so a large random subset of
-# trigger opinions is matched instead, which leaves the stratification intact.
+# One control per trigger opinion, matched on court, period, type, length
+# decile, without replacement. Quota is in the hundreds, so match a large random
+# subset rather than the whole corpus.
 MAX_CONTROL_PAIRS = 80_000
 need = trig.drop_duplicates("opinion_id")[
     ["opinion_id", "court", "period", "type_group", "wdec"]]
@@ -136,14 +129,12 @@ for k, (toid, coid) in enumerate(pairs.items()):
                       "sent_end": se, "issue": iss, "h1_other_court": False,
                       "h2_later_holding": False, "h2_pos": None,
                       "stratum": "CTRL_HOLD", "match_for": toid})
-    # An issue named without any disposition cue. This is the control that does
-    # not depend on the holding locator, so it tests whether the benchmark is
-    # solvable only because controls were found by looking for "we hold".
+    # Issue named with no disposition cue. Independent of the holding locator,
+    # so it tests whether "we hold" is doing the work.
     for j, (s, e, cue, iss) in enumerate(find_neutral_anchors(text, limit=1)):
         ss, se = sentence_span(text, s, e)
-        # A neutral anchor names the issue where it is raised, which is often
-        # many pages before the court answers it. Locate the later holding
-        # sentence so the annotator is not asked to label from the raising alone.
+        # Neutral anchors sit where the issue is raised, often pages before
+        # the answer. Find the later holding sentence too.
         later, lpos = h2_later_resolution(text, s, e, iss)
         crows.append({"item_id": f"r{coid}-{j}", "family": "CTRL_RAND",
                       "opinion_id": coid, "trigger_ids": "", "matched": cue,

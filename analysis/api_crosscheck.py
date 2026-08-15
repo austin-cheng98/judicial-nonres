@@ -1,10 +1,7 @@
-"""External cross-check of corpus coverage against the CourtListener search API.
+"""Cross-check corpus coverage against the CourtListener search API.
 
-The bulk release and the public search index are built from the same database
-but are refreshed on different schedules and tokenized differently. Querying the
-index for literal phrases gives an independent estimate of how many federal
-appellate opinions contain each expression, which bounds how much the local
-extraction pipeline loses to markup handling or text-field precedence.
+Same database, different refresh schedule and tokenization. Bounds what the
+local pipeline loses to markup handling and text-field precedence.
 """
 import json, os, sys, time
 import requests

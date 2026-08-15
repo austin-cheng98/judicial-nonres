@@ -1,10 +1,8 @@
-"""Step 9: model evaluation across context conditions and held-out splits.
+"""Step 9: model evaluation across context widths and held-out splits.
 
-Four systems are compared. The lexical rule is the honest floor: it says how far
-the frozen dictionary alone gets, and any system that fails to beat it is doing
-nothing beyond phrase recognition. The issue-only classifier is a leakage
-control: the issue statement is written to be neutral, so a classifier that sees
-only the issue should be near chance.
+Lexical rule = the floor. Failing to beat it means phrase recognition only.
+Issue-only classifier = leakage control. Issue statements are neutral, so it
+should land near chance.
 """
 import json, os, re, sys
 import numpy as np
@@ -131,11 +129,10 @@ def main():
 
 
 def paired_context_test(out_csv="09_context_test.csv"):
-    """Paired bootstrap on whether a wider window helps, model by model.
+    """Paired bootstrap: does a wider window help, model by model.
 
-    The comparison is within model and within evaluation set, and it resamples
-    the same items for both conditions, so it isolates the effect of the window
-    rather than of anything that differs between splits.
+    Within model, within split, same items in both conditions, so it isolates the
+    window.
     """
     df = pd.read_parquet(os.path.join(OUT, "09_items_with_ctx.parquet"))
     dev = df[df["split"] == "DEV"]

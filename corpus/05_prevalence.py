@@ -1,7 +1,7 @@
-"""Step 5: eligibility filtering, deduplication, and population prevalence.
+"""Step 5: eligibility, dedup, population prevalence.
 
-Eligibility criteria are applied in a fixed order and each one's cost is
-reported, so that the denominator behind every prevalence figure is auditable.
+Criteria in fixed order, each one's cost reported, so every denominator is
+auditable.
 """
 import hashlib, json, os, re, sys
 import numpy as np

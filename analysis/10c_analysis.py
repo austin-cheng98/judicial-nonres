@@ -1,10 +1,6 @@
-"""Step 10c: layer-two statistics with the clustering the design requires.
+"""Step 10c: layer-2 stats, clustered by origin.
 
-Several citing passages can share an origin opinion, so passages are not
-independent. Every interval here resamples origins, not passages. Nothing is
-fitted: the contrast between unresolved and decided origins is descriptive, and
-the matching is what makes it interpretable rather than an identification
-strategy.
+Passages share origins, so intervals resample origins. Descriptive, not fitted.
 """
 import json, os, sys
 import numpy as np

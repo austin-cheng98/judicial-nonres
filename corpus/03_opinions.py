@@ -1,12 +1,7 @@
-"""Step 3: single streaming pass over the 54 GB opinions table.
+"""Step 3: one streaming pass over the 54 GB opinions table.
 
-Everything that requires touching raw opinion text happens here: federal
-appellate filtering, markup stripping, text-source precedence, trigger matching,
-and sharded storage with a byte-offset index so later stages can seek to any
-opinion without rereading the bulk file.
-
-A cheap substring gate runs before the regex union, because only a minority of
-opinions can possibly contain a trigger and regex scanning dominates the cost.
+Filter to the population, strip markup, pick the text source, match triggers,
+shard with a byte-offset index. Substring gate before the regex union, for cost.
 """
 import csv, io, json, os, subprocess, sys, time
 import pandas as pd
@@ -48,9 +43,8 @@ meta, index = [], []
 n_kept = n_seen = n_cand = n_bad = 0
 t0 = time.time()
 
-# Low-level reader: the cluster test runs against the raw row before any dict is
-# built or any markup is stripped, so the ~90% of rows outside the population
-# cost nothing beyond CSV tokenization.
+# Cluster test runs on the raw row, before any dict or markup work, so the ~90%
+# of rows outside the population cost only CSV tokenization.
 proc = subprocess.Popen(["bzip2", "-dc", os.path.join(DATA, "opinions.csv.bz2")],
                         stdout=subprocess.PIPE, bufsize=1 << 22)
 fh_in = io.TextIOWrapper(proc.stdout, encoding="utf-8", errors="replace", newline="")
@@ -113,9 +107,8 @@ for fh in handles:
 cand_fh.close()
 fh_in.close()
 rc = proc.wait()
-# bzip2 verifies a CRC per block, so a non-zero exit here means the archive is
-# damaged and the pass is incomplete. Fail loudly rather than writing a
-# truncated corpus that would silently understate every count downstream.
+# bzip2 CRCs per block, so a non-zero exit means a damaged archive. Fail loudly
+# rather than write a truncated corpus and understate every count.
 if rc != 0:
     raise SystemExit(f"bzip2 exited {rc}: opinions archive is damaged or truncated")
 

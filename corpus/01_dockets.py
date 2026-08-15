@@ -1,7 +1,7 @@
-"""Step 1: identify every docket belonging to a federal appellate court.
+"""Step 1: federal appellate dockets.
 
-The bulk cluster table carries a docket foreign key but no court, so the docket
-table is the only route from an opinion to the court that issued it.
+Clusters carry a docket key but no court, so dockets are the only route from
+opinion to court.
 """
 import json, os, pickle, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(

@@ -1,7 +1,6 @@
-"""Step 11: emit every number the paper reports as a LaTeX macro or table.
+"""Step 11: emit the paper's numbers as LaTeX macros and tables.
 
-No figure in the paper is typed by hand. Each one is defined here from a saved
-artefact, so recompiling after a pipeline change updates the prose as well.
+Nothing typed by hand; each figure comes from a saved artefact.
 """
 import json, os, re, sys
 import numpy as np
@@ -15,9 +14,8 @@ os.makedirs(GEN, exist_ok=True)
 MAC = {}
 MAC_PATH = os.path.join(GEN, "macros.tex")
 
-# Release bundles may omit large intermediate parquets while retaining their
-# generated, verified paper macros. Preserve those values and overwrite only
-# macros whose source artefacts are present in this run.
+# Releases may omit large parquets but keep their generated macros. Preserve
+# those, overwrite only macros whose sources are present this run.
 if os.path.exists(MAC_PATH):
     for _line in open(MAC_PATH, encoding="utf-8"):
         _match = re.fullmatch(
@@ -217,9 +215,8 @@ if res is not None:
     for c in ("TEST", "TEMPORAL", "COURT"):
         if c not in piv:
             piv[c] = np.nan
-    # Degenerate cells are marked rather than silently printed: a model that
-    # collapses to one class scores the majority baseline exactly, and printing
-    # that as a third decimal invites it to be read as a result.
+    # Mark degenerate cells. A model collapsed to one class scores the majority
+    # baseline exactly, which reads as a result if printed plain.
     majf = allr[allr["model"] == "majority"].set_index("split")["macro_f1"].to_dict()
 
     def cell(m, c, sp):
@@ -230,9 +227,8 @@ if res is not None:
         mark = "$^{\\dagger}$" if base is not None and abs(v - base) < 1e-6 else ""
         return f"{v:.3f}{mark}"
 
-    # The frozen dictionary is invariant to the window by construction, since
-    # every window is centred on the anchor, so its four identical rows are
-    # printed once rather than four times.
+    # Every window is anchor-centred, so the dictionary is window-invariant.
+    # Print its four identical rows once.
     rows, seen_lex = [], False
     for m, c in piv.index:
         if m == "lexical-rule":
@@ -354,9 +350,8 @@ if el is not None:
     mac("YearMax", str(int(el["year"].max())))
 
 # --- the frozen regular expressions
-# Rendered as a full-width verbatim block rather than a tabular. A regex is not
-# prose and does not wrap; escaping it into a tabular cell fights the typesetter
-# and loses the one property a reader needs, which is that it can be copied.
+# Full-width verbatim, not a tabular. A regex does not wrap, and escaping it
+# into a cell loses the one thing a reader needs: that it can be copied.
 from triggers import SPEC as TRIG_SPEC
 import textwrap as _tw
 _lines = []
@@ -439,9 +434,8 @@ print("  wrote tab_prev_extra_wrap.tex")
 # --- guidelines verbatim
 import guidelines as G
 def vb(s):
-    # The guideline is written to an 80-column terminal width, which overflows a
-    # two-column page. Re-wrap to the column, preserving the indentation that
-    # carries the rule structure.
+    # Guideline is 80-column, which overflows a two-column page. Re-wrap,
+    # keeping the indentation that carries the rule structure.
     import textwrap
     out = []
     for line in s.strip().split("\n"):
@@ -455,9 +449,8 @@ def vb(s):
     return ("\\begin{quote}\\scriptsize\\begin{verbatim}\n" + "\n".join(out)
             + "\n\\end{verbatim}\\end{quote}\n")
 with open(os.path.join(os.path.dirname(GEN), "guidelines_wrap.tex"), "w") as fh:
-    # Only the layer-one guideline is reproduced. It is the one that produced
-    # every label in the benchmark; the layer-two and issue-statement guides are
-    # in the release, and printing all three costs a page and a half.
+    # Layer-one guideline only. It produced every benchmark label; the other
+    # two are in the release, and printing all three costs a page and a half.
     fh.write(vb(G.LAYER1))
     fh.write(f"\n\\noindent Version {G.VERSION}. The single permitted revision "
              "after the pilot, and the layer-two and issue-statement guidelines, "
