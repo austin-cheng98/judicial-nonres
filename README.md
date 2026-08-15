@@ -1,29 +1,12 @@
-# Need Not Decide — reproduction package
+# Need Not Decide — code and artifacts
 
-Code and released artifacts for *Need Not Decide: A Benchmark for Judicial
-Non-Resolution in U.S. Federal Appellate Opinions*.
+Pipeline code and released artifacts for *Need Not Decide: A Benchmark for
+Judicial Non-Resolution in U.S. Federal Appellate Opinions*.
 
 ```
 scripts/   pipeline, numbered in execution order
 out/       released artifacts: results, prevalence tables, benchmark, labels
-paper/     LaTeX source plus generated tables, macros, and figures
 ```
-
-## Rebuild the paper
-
-Needs Python 3.11+ with pandas, numpy, scipy, scikit-learn, matplotlib, and
-pyarrow, plus [tectonic](https://tectonic-typesetting.github.io/).
-
-```bash
-python3 scripts/11_tables.py        # tables and macros from out/
-python3 scripts/14_errors.py        # error-analysis examples
-python3 scripts/23_pair_tables.py   # paired supplementary float
-python3 scripts/12_figures.py
-python3 scripts/22_more_figs.py
-cd paper && tectonic -X compile main.tex --outdir build
-```
-
-`scripts/pagecheck.py` checks that content ends on page 8.
 
 ## The benchmark
 
@@ -34,14 +17,55 @@ paper reports read off it directly: 364 annotated, 58 `UNCLEAR`, 306 with a
 usable binary label, and 120 / 104 / 36 / 46 across dev, test, temporal, and
 court-held-out.
 
-## Rebuilding out/ from scratch
+## Results
 
-Steps 01–10 rebuild `out/` from the CourtListener bulk release of 30 June 2026
-(58 GB, not included). Steps 05–07 stream that release; everything after works
-on derived artifacts. A few large intermediates are also omitted for size, so
-`11_tables.py` reports them as missing and skips the handful of appendix macros
-that depend on them.
+Every number the paper reports comes from a file in `out/`:
+
+| Claim | File |
+|---|---|
+| Model scores on the three held-out conditions | `09_results.csv`, `09b_encoder_results.csv`, `09c_llm_results.csv` |
+| Accuracy by sampling stratum | `09_by_stratum.csv` |
+| Context-width comparison | `09_context_test.csv` |
+| Population prevalence, by court, period, type, status | `05_prev_*.csv`, `05_prevalence.json` |
+| Learning curve on the adversarial stratum | `20_learning_curve.csv` |
+| Within-annotator context ablation | `08_human_ablation.csv` |
+| Judicial characterizations and escalation | `15_tight_stats.json`, `19_escalation.json`, `21_validation.json` |
+| Search-index cross-check | `api_crosscheck.json` |
+
+## Pipeline
+
+Run in numeric order. Steps 01–05 stream the CourtListener bulk release of
+30 June 2026 (58 GB, not included) and are the only expensive ones; everything
+after works on derived artifacts. A few large intermediates are also omitted for
+size.
+
+| Step | What it does |
+|---|---|
+| 01–04 | Parse the bulk dockets, clusters, opinions, and citation tables |
+| 05 | Apply the frozen trigger dictionary, compute population prevalence |
+| 06–07 | Build the item frame, draw the stratified sample |
+| 08 | Render annotation worksheets; ingest labels |
+| 09 / 09b / 09c | Sparse baselines / fine-tuned encoders / zero-shot LM |
+| 10a–10c | Citation chains and analysis |
+| 13–14 | Dictionary recall audit, error analysis |
+| 15–19, 21 | Judicial characterizations, escalation, proposition matching |
+
+Needs Python 3.11+ with pandas, numpy, scipy, scikit-learn, matplotlib, and
+pyarrow.
+
+Support modules: `common.py` (bulk CSV streaming — the export escapes with
+backslashes, so `csv.reader(fh, escapechar="\\")` is required), `triggers.py`
+(the frozen 13-expression dictionary), `issues.py`, `textstore.py`,
+`guidelines.py`.
+
+Steps 11, 12, 22, and 23 emit LaTeX tables and figures for the paper, whose
+source is not distributed here.
+
+## Models
 
 The zero-shot baseline is `microsoft/Phi-3.5-mini-instruct`, revision
 `2fe192450127e6a83f7441aef6e3ca586c338b77`, float16 on one Tesla T4. Run
-metadata and output hashes are in `out/09c_llm_run_manifest.json`.
+metadata and output hashes are in `out/09c_llm_run_manifest.json`. The model is
+scored by comparing the summed log-probability of the ` DECIDED` and
+` UNRESOLVED` continuations rather than by generating, so refusals and format
+drift cannot vary with prompt length.
