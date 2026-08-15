@@ -6,7 +6,8 @@ reported, so that the denominator behind every prevalence figure is auditable.
 import hashlib, json, os, re, sys
 import numpy as np
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT, FED_APP, PERIODS
 from triggers import SPEC, NAME, DICTIONARY_SHA1
 

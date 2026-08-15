@@ -9,7 +9,8 @@ extraction pipeline loses to markup handling or text-field precedence.
 import json, os, sys, time
 import requests
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import FED_APP, OUT
 
 TOKEN = os.environ.get("CL_TOKEN", "fdbac4bdfe9be4aedb04e3d4e9eaeb2b26a6dc0b")

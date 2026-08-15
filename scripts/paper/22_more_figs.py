@@ -4,7 +4,8 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np, pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 FIG = os.path.join(os.path.dirname(OUT), "paper", "generated")
 plt.rcParams.update({"font.size": 7, "axes.spines.top": False,

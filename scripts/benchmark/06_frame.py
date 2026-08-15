@@ -18,7 +18,8 @@ import json, os, random, sys
 from collections import defaultdict
 import numpy as np
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT, read_jsonl
 from textstore import TextStore
 from issues import (issue_clause, sentence_span, h1_other_court, find_neutral_anchors,

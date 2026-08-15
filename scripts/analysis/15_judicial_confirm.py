@@ -15,7 +15,8 @@ dictionary: fixed before it was run against anything, and reported in full.
 import json, os, re, sys
 from collections import defaultdict
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, stream_csv
 from textstore import TextStore
 

@@ -14,7 +14,8 @@ import json, os, sys
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score, accuracy_score
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 
 MODEL = os.environ.get("LLM_MODEL", "microsoft/Phi-3.5-mini-instruct")

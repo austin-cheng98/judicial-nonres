@@ -11,7 +11,8 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import f1_score, accuracy_score
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 
 MODELS = os.environ.get("ENC_MODELS",

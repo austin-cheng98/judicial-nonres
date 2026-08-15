@@ -14,7 +14,8 @@ independent check on the annotated benchmark, not as a replacement for it.
 """
 import json, os, re, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 from textstore import TextStore
 from issues import content_words, sentence_span

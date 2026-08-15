@@ -6,7 +6,8 @@ artefact, so recompiling after a pipeline change updates the prose as well.
 import json, os, re, sys
 import numpy as np
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT, FED_APP, COURT_LABEL
 
 GEN = os.path.join(os.path.dirname(OUT), "paper", "generated")

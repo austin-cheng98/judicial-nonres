@@ -8,7 +8,8 @@ out-of-population citers can be reported.
 """
 import os, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, stream_csv
 
 meta = pd.read_parquet(os.path.join(OUT, "03_opinions_meta.parquet"),

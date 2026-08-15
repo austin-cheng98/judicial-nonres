@@ -7,7 +7,8 @@ where widening the context flipped the model from wrong to right.
 """
 import gzip, json, os, re, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 from textstore import TextStore
 from triggers import UNION

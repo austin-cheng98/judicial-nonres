@@ -10,7 +10,8 @@ is coarser than annotation and its error rates are reported alongside it.
 """
 import json, os, re, sys
 import numpy as np, pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 from textstore import TextStore
 from triggers import UNION

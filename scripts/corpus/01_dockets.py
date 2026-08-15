@@ -4,7 +4,8 @@ The bulk cluster table carries a docket foreign key but no court, so the docket
 table is the only route from an opinion to the court that issued it.
 """
 import json, os, pickle, sys
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, FED_APP_SET, stream_csv
 
 # --- courts: record the full row for the fourteen target courts, and also note

@@ -13,7 +13,8 @@ Splits are nested and disjoint, so no opinion appears in more than one of them:
 """
 import json, os, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT, FED_APP, PERIODS
 
 SEED = 20260811

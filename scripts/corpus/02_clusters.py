@@ -1,7 +1,8 @@
 """Step 2: federal appellate opinion clusters with normalized metadata."""
 import os, pickle, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, stream_csv, period_of
 
 docket_court = pickle.load(open(os.path.join(OUT, "01_docket_court.pkl"), "rb"))

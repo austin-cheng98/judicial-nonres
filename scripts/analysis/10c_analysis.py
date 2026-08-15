@@ -9,7 +9,8 @@ strategy.
 import json, os, sys
 import numpy as np
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 
 RNG = np.random.default_rng(20260811)

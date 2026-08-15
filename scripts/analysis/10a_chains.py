@@ -8,7 +8,8 @@ to the origin, restricted to passages whose content words overlap the issue.
 import json, os, random, re, sys
 from collections import defaultdict
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, stream_csv
 from textstore import TextStore
 from issues import content_words, sentence_span

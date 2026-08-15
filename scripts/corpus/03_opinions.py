@@ -10,7 +10,8 @@ opinions can possibly contain a trigger and regex scanning dominates the cost.
 """
 import csv, io, json, os, subprocess, sys, time
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import DATA, OUT, best_text
 from triggers import find_all, merge_overlaps, UNION, DICTIONARY_SHA1
 

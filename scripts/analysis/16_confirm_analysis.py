@@ -15,7 +15,8 @@ cited for something other than the issue we annotated.
 import json, os, sys
 import numpy as np
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 from issues import content_words
 

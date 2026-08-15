@@ -12,7 +12,8 @@ and it identifies which expressions the frozen list should have contained.
 """
 import json, os, random, re, sys
 import pandas as pd
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))  # shared modules live in scripts/
 from common import OUT
 from textstore import TextStore
 from issues import issue_clause, sentence_span
