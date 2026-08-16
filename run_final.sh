@@ -1,5 +1,5 @@
 #!/bin/bash
-# Layer-two analysis and paper tables.
+# Layer-two analysis and final validation outputs.
 set -e
 cd "$(dirname "$0")"
 unset OUTDIR
@@ -8,6 +8,4 @@ python3 analysis/10b_worksheet.py ingest
 python3 analysis/10c_analysis.py
 echo "$(date +%T) === human context ablation ==="
 python3 benchmark/08_worksheet.py ablation || echo "(no ablation labels yet)"
-echo "$(date +%T) === tables ==="
-python3 tables/11_tables.py
 echo "$(date +%T) FINAL_DONE"
