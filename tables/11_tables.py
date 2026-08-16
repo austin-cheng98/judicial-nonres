@@ -20,7 +20,8 @@ def _split_sizes():
 
 SPLIT_N = _split_sizes()
 
-GEN = os.path.join(os.path.dirname(OUT), "paper", "generated")
+PAPER_DIR = os.environ.get("PAPER_DIR") or os.path.join(os.path.dirname(OUT), "paper")
+GEN = os.path.join(PAPER_DIR, "generated")
 os.makedirs(GEN, exist_ok=True)
 MAC = {}
 MAC_PATH = os.path.join(GEN, "macros.tex")
@@ -189,29 +190,42 @@ res = load("09_results.csv")
 enc = load("09b_encoder_results.csv")
 llm = load("09c_llm_results.csv")
 llm_run = load("09c_llm_run_manifest.json", "json")
-if llm is not None:
+sol = load("09d_sol_agent_results.csv")
+sol_run = load("09d_sol_agent_run_manifest.json", "json")
+
+
+def validate_context_results(frame, filename):
+    if frame is None:
+        return
     required_cells = pd.MultiIndex.from_product(
         [["SENT", "W256", "W1024", "W4096"], ["TEST", "TEMPORAL", "COURT"]],
         names=["context", "split"],
     )
-    actual_cells = pd.MultiIndex.from_frame(llm[["context", "split"]])
+    actual_cells = pd.MultiIndex.from_frame(frame[["context", "split"]])
     missing_cells = required_cells.difference(actual_cells)
     duplicate_cells = actual_cells[actual_cells.duplicated()].unique()
-    if (len(llm) != 12 or llm["model"].nunique() != 1 or
+    if (len(frame) != 12 or frame["model"].nunique() != 1 or
             len(missing_cells) or len(duplicate_cells)):
         raise ValueError(
-            "09c_llm_results.csv must contain one model and exactly one row for "
-            f"each of 12 context/split cells; rows={len(llm)}, "
-            f"models={llm['model'].unique().tolist()}, "
+            f"{filename} must contain one model and exactly one row for "
+            f"each of 12 context/split cells; rows={len(frame)}, "
+            f"models={frame['model'].unique().tolist()}, "
             f"missing={missing_cells.tolist()}, duplicates={duplicate_cells.tolist()}"
         )
+
+
+validate_context_results(llm, "09c_llm_results.csv")
+validate_context_results(sol, "09d_sol_agent_results.csv")
 if llm_run:
     mac("LLMDevice", esc(llm_run["device"]))
     mac("LLMDtype", esc(llm_run["dtype"]))
     mac("LLMMinutes", f"{llm_run['replacement_elapsed_seconds']/60:.1f}")
     mac("LLMRevision", llm_run["replacement_revision"][:12])
+if sol_run:
+    mac("SolModel", esc(sol_run["model"]))
+    mac("SolReasoning", esc(sol_run["reasoning_effort"]))
 if res is not None:
-    allr = pd.concat([x for x in (res, enc, llm) if x is not None],
+    allr = pd.concat([x for x in (res, enc, llm, sol) if x is not None],
                      ignore_index=True)
     if llm is not None and len(llm):
         mac("LLMName", esc(llm["model"].iloc[0]))
@@ -221,6 +235,16 @@ if res is not None:
             mac("LLMBestCtx", str(t.loc[t["macro_f1"].idxmax(), "context"]))
             mac("LLMSentF", f"{t[t.context=='SENT']['macro_f1'].iloc[0]:.3f}"
                 if (t["context"] == "SENT").any() else "--")
+    if sol is not None and len(sol):
+        mac("SolName", esc(sol["model"].iloc[0]))
+        t = sol[sol["split"] == "TEST"]
+        if len(t):
+            mac("SolBestF", f"{t['macro_f1'].max():.3f}")
+            mac("SolBestCtx", str(t.loc[t["macro_f1"].idxmax(), "context"]))
+            mac("SolSentF", f"{t[t.context=='SENT']['macro_f1'].iloc[0]:.3f}"
+                if (t["context"] == "SENT").any() else "--")
+            mac("SolWideF", f"{t[t.context=='W4096']['macro_f1'].iloc[0]:.3f}"
+                if (t["context"] == "W4096").any() else "--")
     piv = allr.pivot_table(index=["model", "context"], columns="split",
                            values="macro_f1")
     for c in ("TEST", "TEMPORAL", "COURT"):
@@ -240,8 +264,14 @@ if res is not None:
 
     # Every window is anchor-centred, so the dictionary is window-invariant.
     # Print its four identical rows once.
-    rows, seen_lex = [], False
-    for m, c in piv.index:
+    full_rows, seen_lex = [], False
+    context_order = {"ISSUE": -1, "SENT": 0, "W256": 1, "W1024": 2,
+                     "W4096": 3}
+    ordered_index = sorted(
+        piv.index,
+        key=lambda x: (str(x[0]).lower(), context_order.get(str(x[1]), 99)),
+    )
+    for m, c in ordered_index:
         if m == "lexical-rule":
             if seen_lex:
                 continue
@@ -252,9 +282,35 @@ if res is not None:
         else:
             m2 = m
             vals = [cell(m, c, sp) for sp in ("TEST", "TEMPORAL", "COURT")]
-        rows.append(f"{esc(m2)} & {c} & " + " & ".join(vals) + " \\\\")
-    body = "\n".join(rows)
-    write_table("tab_models", body)
+        full_rows.append(f"{esc(m2)} & {c} & " + " & ".join(vals) + " \\\\")
+    write_table("tab_models_all", "\n".join(full_rows))
+
+    # Keep the main comparison at a common context. The complete table remains
+    # in the appendix, and the context profiles are shown as a figure.
+    summary_specs = [
+        ("lexical-rule", "SENT", "any"),
+        ("tfidf-lr", "SENT", "SENT"),
+        ("distilroberta-base", "SENT", "SENT"),
+        ("legal-bert-base-uncased", "SENT", "SENT"),
+    ]
+    if llm is not None and len(llm):
+        summary_specs.append((str(llm["model"].iloc[0]), "SENT", "SENT"))
+    if sol is not None and len(sol):
+        summary_specs.append((str(sol["model"].iloc[0]), "SENT", "SENT"))
+    summary_specs.extend([
+        ("issue-only", "ISSUE", "ISSUE"),
+        ("majority", "-", "-"),
+    ])
+    summary_rows = []
+    for model, lookup_context, display_context in summary_specs:
+        if (model, lookup_context) not in piv.index:
+            continue
+        vals = [cell(model, lookup_context, sp)
+                for sp in ("TEST", "TEMPORAL", "COURT")]
+        summary_rows.append(
+            f"{esc(model)} & {display_context} & " + " & ".join(vals) + " \\\\"
+        )
+    write_table("tab_models", "\n".join(summary_rows))
     lex = res[(res["model"] == "lexical-rule") & (res["split"] == "TEST")]
     if len(lex):
         mac("LexF", f"{lex['macro_f1'].max():.3f}")
@@ -264,8 +320,11 @@ if res is not None:
     maj = res[(res["model"] == "majority") & (res["split"] == "TEST")]
     if len(maj):
         mac("MajorityF", f"{maj['macro_f1'].iloc[0]:.3f}")
-    encc = allr[(allr["split"] == "COURT") & (~allr["model"].isin(
-        ["lexical-rule", "majority", "issue-only"]))]
+    supervised = pd.concat([x for x in (res, enc) if x is not None],
+                           ignore_index=True)
+    encc = supervised[(supervised["split"] == "COURT") &
+                      (~supervised["model"].isin(
+                          ["lexical-rule", "majority", "issue-only"]))]
     if len(encc):
         ec = encc.loc[encc["macro_f1"].idxmax()]
         mac("EncCourtModel", str(ec["model"]))
@@ -274,7 +333,7 @@ if res is not None:
     if len(io_):
         mac("IssueOnlyF", f"{io_['macro_f1'].iloc[0]:.3f}")
         mac("IssueOnlyAcc", pct(io_["acc"].iloc[0]))
-    best = allr[(allr["split"] == "TEST") & (~allr["model"].isin(
+    best = supervised[(supervised["split"] == "TEST") & (~supervised["model"].isin(
         ["lexical-rule", "majority", "issue-only"]))]
     if len(best):
         bb = best.loc[best["macro_f1"].idxmax()]
@@ -704,12 +763,20 @@ SPECS = {
    "model & context & random ($n{=}%d$) & temporal ($n{=}%d$) & court ($n{=}%d$)"
    % SPLIT_N,
    "table*",
-   "Macro-$F_1$ on the three held-out conditions. The lexical rule is the frozen "
-   "dictionary, invariant to the window because every window is anchor-centred, "
-   "and issue-only is the leakage control. Splits are small and the temporal "
-   "split too small to rank models. $\\dagger$ marks a cell equal to the majority "
-   "baseline, meaning the model collapsed to one class.",
+   "Macro-$F_1$ at the anchor sentence, with each control shown at its only "
+   "condition. Figure~\\ref{fig:modelcontext} gives the context profiles and "
+   "Appendix Table~\\ref{tab:modelsall} reports every cell. Phi uses label-token "
+   "likelihoods, while Sol generates constrained labels. $\\dagger$ marks "
+   "collapse to the majority baseline.",
    "models"),
+ "tab_models_all": ("llrrr",
+   "model & context & random ($n{=}%d$) & temporal ($n{=}%d$) & court ($n{=}%d$)"
+   % SPLIT_N,
+   "table*",
+   "Complete macro-$F_1$ results for every model, context, and held-out "
+   "condition. The lexical rule is window-invariant. $\\dagger$ marks collapse "
+   "to the majority baseline.",
+   "modelsall"),
  "tab_layer2": ("lrrrrrrr",
    "origin & $n$ & $L_0$ & $L_1$ & $L_2$ & $L_3$ & $A{=}1$ & $E{=}1$", "table*",
    "How later opinions characterize the origin, by what the origin did. "
@@ -759,7 +826,8 @@ SPECS = {
 # A few tables carry a wide interval column and do not fit a single column at
 # \small. Size is set per table rather than shrinking every float.
 FONT = {"tab_prev_court": "\\footnotesize", "tab_prev_period": "\\footnotesize",
-        "tab_models": "\\footnotesize", "tab_context": "\\scriptsize",
+        "tab_models": "\\footnotesize", "tab_models_all": "\\scriptsize",
+        "tab_context": "\\scriptsize",
         "tab_prev_period": "\\footnotesize", "tab_prev_trigger": "\\footnotesize",
         "tab_recall": "\\footnotesize"}
 

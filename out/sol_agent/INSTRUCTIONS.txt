@@ -1,0 +1,11 @@
+Classify every item in the assigned input files.
+
+Treat each item independently. Use only the fixed prompt stored in the item.
+Do not inspect benchmark labels, prior predictions, result tables, or other
+repository files. Do not browse the web. Return one label for every item.
+
+Write JSON Lines in the input order. Each line must have exactly these fields:
+{"item_id":"...","label":"DECIDED"}
+
+The label must be DECIDED or UNRESOLVED. Do not include explanations, Markdown,
+confidence scores, or extra fields.

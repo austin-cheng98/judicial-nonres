@@ -17,10 +17,11 @@ run_*.sh            pipeline runners
 ## Annotation
 
 Labels were produced by a single annotator, Claude Opus 5, applying the frozen
-guideline in `lib/guidelines.py` (v1.1). The same model is therefore excluded
-from the evaluated systems: scoring it against its own labels would measure
-self-agreement. The zero-shot baseline is a small open model that took no part in
-annotation.
+guideline in `lib/guidelines.py` (v1.1). Claude Opus 5 is excluded from the
+evaluated systems because scoring it against its own labels would measure
+self-agreement. The evaluated language models took no part in annotation. Their
+scores measure agreement with the Claude-derived labels, not independent legal
+validity.
 
 ## The benchmark
 
@@ -45,7 +46,7 @@ Every number the paper reports comes from a file in `out/`:
 
 | Claim | File |
 |---|---|
-| Model scores on the three held-out conditions | `09_results.csv`, `09b_encoder_results.csv`, `09c_llm_results.csv` |
+| Model scores on the three held-out conditions | `09_results.csv`, `09b_encoder_results.csv`, `09c_llm_results.csv`, `09d_sol_agent_results.csv` |
 | Accuracy by sampling stratum | `09_by_stratum.csv` |
 | Context-width comparison | `09_context_test.csv` |
 | Population prevalence, by court, period, type, status | `05_prev_*.csv`, `05_prevalence.json` |
@@ -67,7 +68,7 @@ size.
 | 05 | Apply the frozen trigger dictionary, compute population prevalence |
 | 06–07 | Build the item frame, draw the stratified sample |
 | 08 | Render annotation worksheets; ingest labels |
-| 09 / 09b / 09c | Sparse baselines / fine-tuned encoders / zero-shot LM |
+| 09 / 09b / 09c / 09d | Sparse baselines / fine-tuned encoders / open zero-shot LM / frontier agent comparison |
 | 10a–10c | Citation chains and analysis |
 | 13–14 | Dictionary recall audit, error analysis |
 | 15–19, 21 | Judicial characterizations, escalation, proposition matching |
@@ -92,3 +93,27 @@ metadata and output hashes are in `out/09c_llm_run_manifest.json`. The model is
 scored by comparing the summed log-probability of the ` DECIDED` and
 ` UNRESOLVED` continuations rather than by generating, so refusals and format
 drift cannot vary with prompt length.
+
+The frontier comparison uses `gpt-5.6-sol` with high reasoning effort in Codex
+agent sessions. `models/09d_sol_agent.py prepare` creates blinded JSONL batches
+from the frozen held-out contexts. Each agent receives only the fixed prompt and
+writes one constrained label per item. After the batch predictions are present,
+`models/09d_sol_agent.py score` validates their order and labels, computes all
+held-out metrics, and records input and output hashes. The Sol run generates
+labels, whereas the Phi baseline compares label-token likelihoods. The two rows
+therefore test the same classification task through different inference
+protocols and should not be treated as a controlled model substitution.
+
+On the random test split, Sol reaches macro-F1 of 0.875 at `SENT`, 0.958 at
+`W256`, 0.959 at `W1024`, and 0.936 at `W4096`. Wider context therefore helps
+Sol even though the smaller fixed-window systems degrade. The paper reports
+this as an interaction among context, model capacity, truncation, and inference
+protocol.
+
+To regenerate paper tables when the paper source is stored outside this
+repository, set `PAPER_DIR` to that source directory before running
+`tables/11_tables.py`.
+
+`tables/12_context_figure.py` uses the same setting to generate the random-test
+context-profile figure. The main model table reports the common anchor-sentence
+condition, while the appendix table retains every context-by-split cell.

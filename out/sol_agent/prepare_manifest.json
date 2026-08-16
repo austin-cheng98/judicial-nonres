@@ -1,0 +1,270 @@
+{
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "execution": "Codex multi-agent",
+  "scoring": "generated constrained labels",
+  "prompt": "You are reading a passage from a United States federal appellate opinion.\n\nLegal issue: {issue}\n\nPassage:\n{ctx}\n\nQuestion: Did the court that wrote this opinion resolve that issue, or did it discuss the issue and leave it unresolved?\nAnswer with one word, either DECIDED or UNRESOLVED.\nAnswer:",
+  "agent_instructions_sha256": "3be0ece41ac254f795d9ff455698deea4dd6e4c5f6dae605232db3e7d6f373d3",
+  "source_sha256": "708eccd7e2ee92c3dcd81e222d7e2b131dcd31ae3c818161cfd0b8a15cb90147",
+  "batch_sizes": {
+    "SENT": 186,
+    "W256": 62,
+    "W1024": 24,
+    "W4096": 8
+  },
+  "seed": 20260816,
+  "inputs": [
+    {
+      "context": "SENT",
+      "batch": 0,
+      "n": 186,
+      "path": "out/sol_agent/input_SENT_00.jsonl",
+      "sha256": "e1e5078a652f4ab43b9d3b8d3751a34aab933d8e14efdf3d94ae64d8b9b124b3"
+    },
+    {
+      "context": "W256",
+      "batch": 0,
+      "n": 62,
+      "path": "out/sol_agent/input_W256_00.jsonl",
+      "sha256": "933bf86e00e4f0c05357ce603ceaedd51a5bab6eb49744961933dc83e28e8ed9"
+    },
+    {
+      "context": "W256",
+      "batch": 1,
+      "n": 62,
+      "path": "out/sol_agent/input_W256_01.jsonl",
+      "sha256": "d1f4f965c30b1e6d127c910cd4006f767f9f85fd3633990699e9940381295b58"
+    },
+    {
+      "context": "W256",
+      "batch": 2,
+      "n": 62,
+      "path": "out/sol_agent/input_W256_02.jsonl",
+      "sha256": "ae882a12377edaf3a7a07177d055de5585c2a654c7eb4121629b4900be6d900b"
+    },
+    {
+      "context": "W1024",
+      "batch": 0,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_00.jsonl",
+      "sha256": "d46647133ce9bcab5aae1a2d1f0e26c3c57e005d4558614c9ed81d7c1ef26098"
+    },
+    {
+      "context": "W1024",
+      "batch": 1,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_01.jsonl",
+      "sha256": "0d52200504fba85e7fcb3d0b324f90318c82c26822f791aea36fb57270bb14c2"
+    },
+    {
+      "context": "W1024",
+      "batch": 2,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_02.jsonl",
+      "sha256": "99bacd92b64997537315085131cb8d00bdd75e97098a1ce712a22362c53aad9c"
+    },
+    {
+      "context": "W1024",
+      "batch": 3,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_03.jsonl",
+      "sha256": "75255dde961e4ce148b02f6afad8c785cbe5d043c6a4cc28db12e4db6e234003"
+    },
+    {
+      "context": "W1024",
+      "batch": 4,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_04.jsonl",
+      "sha256": "0358948216123559b1a21646c6abc8e26c32a1f8116c4489f6d45635b4dadf66"
+    },
+    {
+      "context": "W1024",
+      "batch": 5,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_05.jsonl",
+      "sha256": "98bc614f51ad07119f4e7c6772028f0d5d3a7b0e50d30a66985a56708b6f38a0"
+    },
+    {
+      "context": "W1024",
+      "batch": 6,
+      "n": 24,
+      "path": "out/sol_agent/input_W1024_06.jsonl",
+      "sha256": "9a90ca20463fbd10a8d5a600083e9085d08521862d874af160cca17f50682996"
+    },
+    {
+      "context": "W1024",
+      "batch": 7,
+      "n": 18,
+      "path": "out/sol_agent/input_W1024_07.jsonl",
+      "sha256": "81e37c17a3a29f6f4796129593622ddab9f54b6c1310fda0ca8b55bcff3ee737"
+    },
+    {
+      "context": "W4096",
+      "batch": 0,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_00.jsonl",
+      "sha256": "b7e2d9d4cbef4fc48224b900b223b6680ce7f07df011283969b4259ef02f7215"
+    },
+    {
+      "context": "W4096",
+      "batch": 1,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_01.jsonl",
+      "sha256": "87c27b38c43de5428c4b46b1dd12e15e33a0bfdff4c11953d1af7fb95357f05e"
+    },
+    {
+      "context": "W4096",
+      "batch": 2,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_02.jsonl",
+      "sha256": "e1f3555cd424bcd0f0196431942310d62adec0edaa918df1cc42e58391e057c3"
+    },
+    {
+      "context": "W4096",
+      "batch": 3,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_03.jsonl",
+      "sha256": "23e59c10c5a14890f54c5d5083bdb44d78a26cdca03ac137600829427696cc51"
+    },
+    {
+      "context": "W4096",
+      "batch": 4,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_04.jsonl",
+      "sha256": "d38449a1603bb69baab06eaea8393832fd1ecb0e60f4fd182bac5d318a38a285"
+    },
+    {
+      "context": "W4096",
+      "batch": 5,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_05.jsonl",
+      "sha256": "a97672ab24d1acfce3caa66d1b0b1408852490d54baea9880a3bb9c12b01b3d4"
+    },
+    {
+      "context": "W4096",
+      "batch": 6,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_06.jsonl",
+      "sha256": "ebc84cd941acb0cd6c72faa23128dc5927592fd978345bc571090733e8ff02ce"
+    },
+    {
+      "context": "W4096",
+      "batch": 7,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_07.jsonl",
+      "sha256": "5980162643febd23181590c6dd7845f6ba80d440b0040d1192b6057e89a98be2"
+    },
+    {
+      "context": "W4096",
+      "batch": 8,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_08.jsonl",
+      "sha256": "4ec5fea4ce6d227ab90775310d3e7f5f7837612e32258220a47271a0ceb36c02"
+    },
+    {
+      "context": "W4096",
+      "batch": 9,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_09.jsonl",
+      "sha256": "20a3af3412c9c28306e3e7309031362100617b5341168314ad22bbafa6c5e995"
+    },
+    {
+      "context": "W4096",
+      "batch": 10,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_10.jsonl",
+      "sha256": "e853c550efdb113dc067aa34bcb9936e6eda5e6dc5b0b9a30416b6728ece6dcb"
+    },
+    {
+      "context": "W4096",
+      "batch": 11,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_11.jsonl",
+      "sha256": "255106e032d5f4744bb091ab4bae59370a34fe1f4fa4dc463ae37a4ae982c452"
+    },
+    {
+      "context": "W4096",
+      "batch": 12,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_12.jsonl",
+      "sha256": "b41f00cf52f517a6dde26ddc5a5301bea624088a5f146aeace72d6c019385834"
+    },
+    {
+      "context": "W4096",
+      "batch": 13,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_13.jsonl",
+      "sha256": "c46381ea22db78498f03bb008a7d57fbe6475c14d035ad487a3f51499a657e25"
+    },
+    {
+      "context": "W4096",
+      "batch": 14,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_14.jsonl",
+      "sha256": "d87e10f9307399776d3b59ebafea8bd96e795abf36fba68c5f0949d1694e3d75"
+    },
+    {
+      "context": "W4096",
+      "batch": 15,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_15.jsonl",
+      "sha256": "f116074aa7336a428b9840d80242a5c5072edf0333afa6b3f96a7019938d6159"
+    },
+    {
+      "context": "W4096",
+      "batch": 16,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_16.jsonl",
+      "sha256": "2a2e7796f359148e106cd84f9da4176c0cb053b39025c8a54fa23b30e347af30"
+    },
+    {
+      "context": "W4096",
+      "batch": 17,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_17.jsonl",
+      "sha256": "b342d96ca47e09604e56955a22310d513b9e9545458e97357b47867d4f405363"
+    },
+    {
+      "context": "W4096",
+      "batch": 18,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_18.jsonl",
+      "sha256": "07be5a6b4814482e23a7a381fdabda41b3524b7d1152d62404619f9317dbbb27"
+    },
+    {
+      "context": "W4096",
+      "batch": 19,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_19.jsonl",
+      "sha256": "02e60265825fd46f5c5cc4a76cc1e922b71b465b1c03f8dd7ab025934f4d5cf6"
+    },
+    {
+      "context": "W4096",
+      "batch": 20,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_20.jsonl",
+      "sha256": "1c7dbc3a90bbf8ece12adbe83f759bf67c51047524cf2917d1af2700c707e01c"
+    },
+    {
+      "context": "W4096",
+      "batch": 21,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_21.jsonl",
+      "sha256": "fb63a6cf3b885506763af63180b936e6900a95060b3dc39a3eae9207cc827c67"
+    },
+    {
+      "context": "W4096",
+      "batch": 22,
+      "n": 8,
+      "path": "out/sol_agent/input_W4096_22.jsonl",
+      "sha256": "cc8b3d4d629e5cab1f5b139b985a9e4f5183da19be2e7cc11459eaf47fb6c0bf"
+    },
+    {
+      "context": "W4096",
+      "batch": 23,
+      "n": 2,
+      "path": "out/sol_agent/input_W4096_23.jsonl",
+      "sha256": "326726f723807e28ef1e4702cf5c6ee0daf605370a9c6b1d18fbf1f853430288"
+    }
+  ]
+}
