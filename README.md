@@ -14,6 +14,14 @@ out/                released artifacts: results, prevalence tables, benchmark
 run_*.sh            pipeline runners
 ```
 
+## Annotation
+
+Labels were produced by a single annotator, Claude Opus 5, applying the frozen
+guideline in `lib/guidelines.py` (v1.1). The same model is therefore excluded
+from the evaluated systems: scoring it against its own labels would measure
+self-agreement. The zero-shot baseline is a small open model that took no part in
+annotation.
+
 ## The benchmark
 
 `out/08_benchmark_labels.csv` holds all 364 annotated items as opinion
